@@ -4,8 +4,7 @@ PA1
 24 Variant
 Sydorenko Roman TP-21мп
 
-Twice Oblique Trochoid Cylindroid
+Surface of Revolution 'Wellenkugel'
 
-![img.png](images/scr1.png)
-
-![img.png](images/scr2.png)
+![img.png](images/img1.png)
+![img.png](images/img2.png)
