@@ -6,6 +6,6 @@ Sydorenko Roman TP-21мп
 
 Twice Oblique Trochoid Cylindroid
 
-![img.png](scr1.png)
+![img.png](images/scr1.png)
 
-![img.png](scr2.png)
+![img.png](images/scr2.png)
