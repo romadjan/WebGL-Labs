@@ -1,4 +1,3 @@
-/**/
 'use strict';
 
 let gl;                         // The webgl context.
@@ -15,6 +14,7 @@ function deg2rad(angle) {
 function Model(name) {
     this.name = name;
     this.iVertexBuffer = gl.createBuffer();
+    this.iNormalBuffer = gl.createBuffer();
     this.count = 0;
 
     this.BufferData = function (vertices) {
@@ -25,13 +25,24 @@ function Model(name) {
         this.count = vertices.length / 3;
     }
 
+    this.NormalBufferData = function (normals) {
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STREAM_DRAW);
+
+        this.count = normals.length / 3;
+    }
+
     this.Draw = function () {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
         gl.vertexAttribPointer(shProgram.iAttribVertex, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(shProgram.iAttribVertex);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iNormalBuffer);
+        gl.vertexAttribPointer(shProgram.iAttribNormal, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(shProgram.iAttribNormal);
 
-        gl.drawArrays(gl.LINE_STRIP, 0, this.count);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.count);
     }
 }
 
@@ -44,10 +55,13 @@ function ShaderProgram(name, program) {
 
     // Location of the attribute variable in the shader program.
     this.iAttribVertex = -1;
+    this.iAttribNormal = -1;
     // Location of the uniform specifying a color for the primitive.
     this.iColor = -1;
     // Location of the uniform matrix representing the combined transformation.
     this.iModelViewProjectionMatrix = -1;
+    this.iNormalMatrix = -1;
+    this.lightPosLoc = -1;
 
     this.Use = function () {
         gl.useProgram(this.prog);
@@ -64,7 +78,9 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     /* Set the values of the projection transformation */
-    let projection = m4.perspective(Math.PI / 8, 1, 8, 12);
+    // let projection = m4.perspective(Math.PI / 8, 1, 8, 12);
+    let para = 3
+    let projection = m4.orthographic(-para, para, -para, para, 0, para * 4);
 
     /* Get the view matrix from the SimpleRotator object.*/
     let modelView = spaceball.getViewMatrix();
@@ -81,77 +97,163 @@ function draw() {
 
     gl.uniformMatrix4fv(shProgram.iModelViewProjectionMatrix, false, modelViewProjection);
 
-    /* Draw the six faces of a cube, with different colors. */
-    gl.uniform4fv(shProgram.iColor, [1, 1, 0, 1]);
+    let modelviewInv = new Float32Array(16);
+    let normalmatrix = new Float32Array(16);
+    mat4Invert(modelViewProjection, modelviewInv);
+    mat4Transpose(modelviewInv, normalmatrix);
 
+    gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalmatrix);
+
+    /* Draw the six faces of a cube, with different colors. */
+    gl.uniform4fv(shProgram.iColor, [0.2, 0.8, 0, 1]);
+    gl.uniform3fv(shProgram.lightPosLoc, [10 * Math.cos(Date.now() * 0.005), 1, 10 * Math.sin(Date.now() * 0.005)]);
     surface.Draw();
 }
+function draw_() {
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-function CreateSurfaceData() {
+    /* Set the values of the projection transformation */
+    // let projection = m4.perspective(Math.PI / 8, 1, 8, 12);
+    let para = 3
+    let projection = m4.orthographic(-para, para, -para, para, 0, para * 4);
+
+    /* Get the view matrix from the SimpleRotator object.*/
+    let modelView = spaceball.getViewMatrix();
+
+    let rotateToPointZero = m4.axisRotation([0.707, 0.707, 0], 0.7);
+    let translateToPointZero = m4.translation(0, 0, -10);
+
+    let matAccum0 = m4.multiply(rotateToPointZero, modelView);
+    let matAccum1 = m4.multiply(translateToPointZero, matAccum0);
+
+    /* Multiply the projection matrix times the modelview matrix to give the
+       combined transformation matrix, and send that to the shader program. */
+    let modelViewProjection = m4.multiply(projection, matAccum1);
+
+    gl.uniformMatrix4fv(shProgram.iModelViewProjectionMatrix, false, modelViewProjection);
+
+    let modelviewInv = new Float32Array(16);
+    let normalmatrix = new Float32Array(16);
+    mat4Invert(modelViewProjection, modelviewInv);
+    mat4Transpose(modelviewInv, normalmatrix);
+
+    gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalmatrix);
+
+    /* Draw the six faces of a cube, with different colors. */
+    gl.uniform4fv(shProgram.iColor, [0.2, 0.8, 0, 1]);
+    gl.uniform3fv(shProgram.lightPosLoc, [10 * Math.cos(Date.now() * 0.001), 1, 10 * Math.sin(Date.now() * 0.001)]);
+    surface.Draw();
+    window.requestAnimationFrame(draw_)
+}
+
+function dot(a, b) {
+    let c = [(a[1] * b[2] - a[2] * b[1]), (a[0] * b[2] - b[0] * a[2]), (a[0] * b[1] - a[1] * b[0])]
+    return c
+}
+function normalize(a) {
+    let d = Math.sqrt(a[0] ** 2 + a[1] ** 2 + a[2] ** 2)
+    let n = [a[0] / d, a[1] / d, a[2] / d]
+    return n;
+}
+
+function CreateSurfaceData(norms = false) {
     let vertexList = [];
+    let normalsList = [];
 
     let i = 0;
     let j = 0;
     let b = true;
-    while (i < 14.5) {
+    while (i < 14.4) {
         if (b) {
             while (j < 1.5 * Math.PI) {
-                vertexList.push(
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.cos(j),
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.sin(j),
-                    0.1 * i * Math.sin(Math.cos(i))
-                );
+                let v1 = surfaceFun(i, j)
+                let v2 = surfaceFun(i + 0.1, j)
+                let v3 = surfaceFun(i, j + 0.1)
+                vertexList.push(v1.x, v1.y, v1.z);
+                vertexList.push(v2.x, v2.y, v2.z);
+                vertexList.push(v3.x, v3.y, v3.z);
+                let v4 = surfaceFun(i + 0.1, j + 0.1);
+                vertexList.push(v2.x, v2.y, v2.z);
+                vertexList.push(v4.x, v4.y, v4.z);
+                vertexList.push(v3.x, v3.y, v3.z);
+                let v21 = { x: v2.x - v1.x, y: v2.y - v1.y, z: v2.z - v1.z }
+                let v31 = { x: v3.x - v1.x, y: v3.y - v1.y, z: v3.z - v1.z }
+                let n1 = vec3Cross(v21, v31);
+                vec3Normalize(n1);
+                normalsList.push(n1.x, n1.y, n1.z);
+                normalsList.push(n1.x, n1.y, n1.z);
+                normalsList.push(n1.x, n1.y, n1.z);
+                let v42 = { x: v4.x - v2.x, y: v4.y - v2.y, z: v4.z - v2.z };
+                let v32 = { x: v3.x - v2.x, y: v3.y - v2.y, z: v3.z - v2.z };
+                let n2 = vec3Cross(v42, v32);
+                vec3Normalize(n2);
+                normalsList.push(n2.x, n2.y, n2.z);
+                normalsList.push(n2.x, n2.y, n2.z);
+                normalsList.push(n2.x, n2.y, n2.z);
                 j += 0.1
             }
-            j = 1.5 * Math.PI
-        } else {
+            j = 1.5 * Math.PI;
+            b = !b
+        }
+        else {
             while (j > 0) {
-                vertexList.push(
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.cos(j),
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.sin(j),
-                    0.1 * i * Math.sin(Math.cos(i))
-                );
+                let v1 = surfaceFun(i, j)
+                let v2 = surfaceFun(i - 0.1, j)
+                let v3 = surfaceFun(i, j - 0.1)
+                vertexList.push(v1.x, v1.y, v1.z);
+                vertexList.push(v2.x, v2.y, v2.z);
+                vertexList.push(v3.x, v3.y, v3.z);
+                let v4 = surfaceFun(i - 0.1, j - 0.1);
+                vertexList.push(v2.x, v2.y, v2.z);
+                vertexList.push(v4.x, v4.y, v4.z);
+                vertexList.push(v3.x, v3.y, v3.z);
+                let v21 = { x: v2.x - v1.x, y: v2.y - v1.y, z: v2.z - v1.z }
+                let v31 = { x: v3.x - v1.x, y: v3.y - v1.y, z: v3.z - v1.z }
+                let n1 = vec3Cross(v21, v31);
+                vec3Normalize(n1);
+                normalsList.push(n1.x, n1.y, n1.z);
+                normalsList.push(n1.x, n1.y, n1.z);
+                normalsList.push(n1.x, n1.y, n1.z);
+                let v42 = { x: v4.x - v2.x, y: v4.y - v2.y, z: v4.z - v2.z };
+                let v32 = { x: v3.x - v2.x, y: v3.y - v2.y, z: v3.z - v2.z };
+                let n2 = vec3Cross(v42, v32);
+                vec3Normalize(n2);
+                normalsList.push(n2.x, n2.y, n2.z);
+                normalsList.push(n2.x, n2.y, n2.z);
+                normalsList.push(n2.x, n2.y, n2.z);
                 j -= 0.1
             }
             j = 0;
+            b = !b
+            i += 0.1
         }
 
-        i += 0.1
-
-        b = !b
     }
-    i = 0;
-    j = 0;
-    b = true;
-    while (j < 1.5 * Math.PI) {
-        if (b) {
-            while (i < 14.5) {
-                vertexList.push(
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.cos(j),
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.sin(j),
-                    0.1 * i * Math.sin(Math.cos(i))
-                );
-                i += 0.1
-            }
-            i = 14.5
-        } else {
-            while (i > 0) {
-                vertexList.push(
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.cos(j),
-                    0.1 * i * Math.cos(Math.cos(i)) * Math.sin(j),
-                    0.1 * i * Math.sin(Math.cos(i))
-                );
-                i -= 0.1
-            }
-            i = 0;
-        }
-        j += 0.1
-        b = !b
+    if (norms) {
+        return normalsList;
     }
-
     return vertexList;
 }
 
+function surfaceFun(u, v) {
+    let x = 0.1 * u * Math.cos(Math.cos(u)) * Math.cos(v);
+    let y = 0.1 * u * Math.cos(Math.cos(u)) * Math.sin(v);
+    let z = 0.1 * u * Math.sin(Math.cos(u));
+    return { x: x, y: y, z: z }
+}
+
+function vec3Cross(a, b) {
+    let x = a.y * b.z - b.y * a.z;
+    let y = a.z * b.x - b.z * a.x;
+    let z = a.x * b.y - b.x * a.y;
+    return { x: x, y: y, z: z }
+}
+
+function vec3Normalize(a) {
+    var mag = Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+    a[0] /= mag; a[1] /= mag; a[2] /= mag;
+}
 
 /* Initialize the WebGL context. Called from init() */
 function initGL() {
@@ -161,12 +263,16 @@ function initGL() {
     shProgram.Use();
 
     shProgram.iAttribVertex = gl.getAttribLocation(prog, "vertex");
+    shProgram.iAttribNormal = gl.getAttribLocation(prog, "normal");
     shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(prog, "ModelViewProjectionMatrix");
+    shProgram.iNormalMatrix = gl.getUniformLocation(prog, "NormalMatrix");
     shProgram.iColor = gl.getUniformLocation(prog, "color");
+    shProgram.lightPosLoc = gl.getUniformLocation(prog, "lightPosition");
 
     surface = new Model('Surface');
     surface.BufferData(CreateSurfaceData());
-    console.log(CreateSurfaceData());
+    surface.NormalBufferData(CreateSurfaceData(1));
+
 
     gl.enable(gl.DEPTH_TEST);
 }
@@ -210,19 +316,25 @@ function createProgram(gl, vShader, fShader) {
 function init() {
     let canvas;
     try {
-        canvas = document.getElementById("webglcanvas");
+        let resolution = Math.min(window.innerHeight, window.innerWidth);
+        canvas = document.querySelector('canvas');
         gl = canvas.getContext("webgl");
+        canvas.width = resolution;
+        canvas.height = resolution;
+        gl.viewport(0, 0, resolution, resolution);
         if (!gl) {
             throw "Browser does not support WebGL";
         }
-    } catch (e) {
-        document.getElementById("canvas-holder").innerHTML =
+    }
+    catch (e) {
+        document.querySelector('"canvas-holder"').innerHTML =
             "<p>Sorry, could not get a WebGL graphics context.</p>";
         return;
     }
     try {
         initGL();  // initialize the WebGL graphics context
-    } catch (e) {
+    }
+    catch (e) {
         document.getElementById("canvas-holder").innerHTML =
             "<p>Sorry, could not initialize the WebGL graphics context: " + e + "</p>";
         return;
@@ -230,5 +342,56 @@ function init() {
 
     spaceball = new TrackballRotator(canvas, draw, 0);
 
-    draw();
+    window.requestAnimationFrame(draw_);
+}
+
+function mat4Transpose(a, transposed) {
+    var t = 0;
+    for (var i = 0; i < 4; ++i) {
+        for (var j = 0; j < 4; ++j) {
+            transposed[t++] = a[j * 4 + i];
+        }
+    }
+}
+
+function mat4Invert(m, inverse) {
+    var inv = new Float32Array(16);
+    inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] +
+        m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
+    inv[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] -
+        m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
+    inv[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] +
+        m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
+    inv[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] -
+        m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
+    inv[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] -
+        m[9] * m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
+    inv[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] +
+        m[8] * m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
+    inv[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] -
+        m[8] * m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
+    inv[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] +
+        m[8] * m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
+    inv[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] +
+        m[5] * m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
+    inv[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] -
+        m[4] * m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
+    inv[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] +
+        m[4] * m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
+    inv[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] -
+        m[4] * m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
+    inv[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] -
+        m[5] * m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
+    inv[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] +
+        m[4] * m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
+    inv[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] -
+        m[4] * m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
+    inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] +
+        m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
+
+    var det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+    if (det == 0) return false;
+    det = 1.0 / det;
+    for (var i = 0; i < 16; i++) inverse[i] = inv[i] * det;
+    return true;
 }
