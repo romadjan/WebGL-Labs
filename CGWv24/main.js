@@ -4,6 +4,8 @@ let gl;                         // The webgl context.
 let surface;                    // A surface model
 let shProgram;                  // A shader program
 let spaceball;                  // A SimpleRotator object that lets the user rotate the view by mouse.
+let userPointCoord;
+let userRotAngle;
 
 function deg2rad(angle) {
     return angle * Math.PI / 180;
@@ -15,7 +17,9 @@ function Model(name) {
     this.name = name;
     this.iVertexBuffer = gl.createBuffer();
     this.iNormalBuffer = gl.createBuffer();
+    this.iTextureBuffer = gl.createBuffer();
     this.count = 0;
+    this.countT = 0;
 
     this.BufferData = function (vertices) {
 
@@ -33,14 +37,27 @@ function Model(name) {
         this.count = normals.length / 3;
     }
 
+    this.TextureBufferData = function (points) {
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iTextureBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STREAM_DRAW);
+
+        this.countT = points.length / 2;
+    }
+
     this.Draw = function () {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
         gl.vertexAttribPointer(shProgram.iAttribVertex, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(shProgram.iAttribVertex);
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.iNormalBuffer);
         gl.vertexAttribPointer(shProgram.iAttribNormal, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(shProgram.iAttribNormal);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iTextureBuffer);
+        gl.vertexAttribPointer(shProgram.iAttribTexture, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(shProgram.iAttribTexture);
 
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.count);
     }
@@ -56,12 +73,19 @@ function ShaderProgram(name, program) {
     // Location of the attribute variable in the shader program.
     this.iAttribVertex = -1;
     this.iAttribNormal = -1;
+    this.iAttribTexture = -1;
     // Location of the uniform specifying a color for the primitive.
     this.iColor = -1;
     // Location of the uniform matrix representing the combined transformation.
     this.iModelViewProjectionMatrix = -1;
     this.iNormalMatrix = -1;
     this.lightPosLoc = -1;
+
+    this.iUserPoint = -1;
+    this.irotAngle = 0;
+    this.iUP = -1;
+
+    this.iTMU = -1;
 
     this.Use = function () {
         gl.useProgram(this.prog);
@@ -107,6 +131,11 @@ function draw() {
     /* Draw the six faces of a cube, with different colors. */
     gl.uniform4fv(shProgram.iColor, [0.2, 0.8, 0, 1]);
     gl.uniform3fv(shProgram.lightPosLoc, [10 * Math.cos(Date.now() * 0.005), 1, 10 * Math.sin(Date.now() * 0.005)]);
+
+    gl.uniform1i(shProgram.iTMU, 0);
+    gl.enable(gl.TEXTURE_2D);
+    gl.uniform2fv(shProgram.iUserPoint, [userPointCoord.x, userPointCoord.y]); //giving coordinates of user point
+    gl.uniform1f(shProgram.irotAngle, userRotAngle);
     surface.Draw();
 }
 function draw_() {
@@ -144,7 +173,8 @@ function draw_() {
     gl.uniform4fv(shProgram.iColor, [0.2, 0.8, 0, 1]);
     gl.uniform3fv(shProgram.lightPosLoc, [10 * Math.cos(Date.now() * 0.001), 1, 10 * Math.sin(Date.now() * 0.001)]);
     surface.Draw();
-    window.requestAnimationFrame(draw_)
+    draw();
+    // window.requestAnimationFrame(draw_)
 }
 
 function dot(a, b) {
@@ -155,6 +185,71 @@ function normalize(a) {
     let d = Math.sqrt(a[0] ** 2 + a[1] ** 2 + a[2] ** 2)
     let n = [a[0] / d, a[1] / d, a[2] / d]
     return n;
+}
+
+function map(val, f1, t1, f2, t2) {
+    let m;
+    m = (val - f1) * (t2 - f2) / (t1 - f1) + f2
+    return Math.min(Math.max(m, f2), t2);
+}
+
+function CreateTextureData() {
+    let texCoordList = [];
+    let i = 0;
+    let j = 0;
+    let b = true;
+    while (i < 14.4) {
+        if (b) {
+            while (j < 1.5 * Math.PI) {
+                let u = map(i, 0, 14.4, 0, 1);
+                let v = map(j, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i + 0.1, 0, 14.4, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i, 0, 14.4, 0, 1);
+                v = map(j + 0.1, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i + 0.1, 0, 14.4, 0, 1);
+                v = map(j, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i + 0.1, 0, 14.4, 0, 1);
+                v = map(j + 0.1, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i, 0, 14.4, 0, 1);
+                v = map(j + 0.1, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                j += 0.1;
+            }
+            j = 1.5 * Math.PI
+            
+        }
+        else {
+            while (j > 0) {
+                let u = map(i, 0, 14.4, 0, 1);
+                let v = map(j, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i + 0.1, 0, 14.4, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i, 0, 14.4, 0, 1);
+                v = map(j + 0.1, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i + 0.1, 0, 14.4, 0, 1);
+                v = map(j, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i + 0.1, 0, 14.4, 0, 1);
+                v = map(j + 0.1, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                u = map(i, 0, 14.4, 0, 1);
+                v = map(j + 0.1, 0, 1.5 * Math.PI, 0, 1);
+                texCoordList.push(u, v);
+                j -= 0.1;
+            }
+            j = 0
+            i += 0.1;
+        }
+        b = !b
+    }
+    return texCoordList;
 }
 
 function CreateSurfaceData(norms = false) {
@@ -264,15 +359,23 @@ function initGL() {
 
     shProgram.iAttribVertex = gl.getAttribLocation(prog, "vertex");
     shProgram.iAttribNormal = gl.getAttribLocation(prog, "normal");
+    shProgram.iAttribTexture = gl.getAttribLocation(prog, "texCoord");
     shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(prog, "ModelViewProjectionMatrix");
     shProgram.iNormalMatrix = gl.getUniformLocation(prog, "NormalMatrix");
     shProgram.iColor = gl.getUniformLocation(prog, "color");
     shProgram.lightPosLoc = gl.getUniformLocation(prog, "lightPosition");
+    shProgram.iTMU = gl.getUniformLocation(prog, 'tmu');
+    shProgram.iUserPoint = gl.getUniformLocation(prog, 'userPoint');
+    shProgram.irotAngle = gl.getUniformLocation(prog, 'rotA');
+    shProgram.iUP = gl.getUniformLocation(prog, 'translateUP');
 
     surface = new Model('Surface');
     surface.BufferData(CreateSurfaceData());
     surface.NormalBufferData(CreateSurfaceData(1));
-
+    LoadTexture();
+    console.log(CreateSurfaceData().length)
+    console.log(CreateTextureData().length)
+    surface.TextureBufferData(CreateTextureData());
 
     gl.enable(gl.DEPTH_TEST);
 }
@@ -314,6 +417,8 @@ function createProgram(gl, vShader, fShader) {
  * initialization function that will be called when the page has loaded
  */
 function init() {
+    userPointCoord = { x: 0.5, y: 0.5 }
+    userRotAngle = 0.0;
     let canvas;
     try {
         let resolution = Math.min(window.innerHeight, window.innerWidth);
@@ -342,7 +447,8 @@ function init() {
 
     spaceball = new TrackballRotator(canvas, draw, 0);
 
-    window.requestAnimationFrame(draw_);
+    draw();
+    // window.requestAnimationFrame(draw_);
 }
 
 function mat4Transpose(a, transposed) {
@@ -395,3 +501,33 @@ function mat4Invert(m, inverse) {
     for (var i = 0; i < 16; i++) inverse[i] = inv[i] * det;
     return true;
 }
+
+function LoadTexture() {
+    let texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 512, 512, 0, );
+
+    const image = new Image();
+    image.crossOrigin = 'anonymus';
+    image.src = "https://raw.githubusercontent.com/romadjan/WebGL-Labs/CGW/Wave.png";
+    image.onload = () => {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            gl.RGBA,
+            gl.RGBA,
+            gl.UNSIGNED_BYTE,
+            image
+        );
+        draw()
+    }
+}
+
+onmousemove = (e) => {
+    userRotAngle = map(e.clientX, 0, window.outerWidth, 0, Math.PI * 0.5)
+    draw()
+};

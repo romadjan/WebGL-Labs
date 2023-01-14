@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ddbee12d-d6d9-432c-a6a8-d39413eef0be" name="Changes" comment="[PA2] rename file and add gif">
+      <change beforePath="$PROJECT_DIR$/PA2v24/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PA2v24/Utils/m4.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PA2v24/Utils/trackball-rotator.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PA2v24/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PA2v24/main.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PA2v24/shader.gpu" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/img1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/img2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pa2.gif" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="PA2" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2JMATsXoP7OoudReJlXhRdJPkQZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/roman/webgl-labs/WebGL-Labs",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/images" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/images" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="WebGL-Labs" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ddbee12d-d6d9-432c-a6a8-d39413eef0be" name="Changes" comment="" />
+      <created>1671877588860</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1671877588860</updated>
+      <workItem from="1671877589961" duration="5502000" />
+      <workItem from="1672257783912" duration="4848000" />
+      <workItem from="1673380533898" duration="3681000" />
+      <workItem from="1673729744248" duration="814000" />
+    </task>
+    <task id="LOCAL-00001" summary="initial commit">
+      <created>1671877871210</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1671877871210</updated>
+    </task>
+    <task id="LOCAL-00002" summary="[PA1] Twice Oblique Trochoid Cylindroid">
+      <created>1671880159318</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1671880159318</updated>
+    </task>
+    <task id="LOCAL-00003" summary="[PA1] add gitignore file">
+      <created>1671880306576</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1671880306576</updated>
+    </task>
+    <task id="LOCAL-00004" summary="[PA1] add gitignore file">
+      <created>1671880425806</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1671880425806</updated>
+    </task>
+    <task id="LOCAL-00005" summary="[PA1] add gitignore file">
+      <created>1671880884741</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1671880884741</updated>
+    </task>
+    <task id="LOCAL-00006" summary="[PA1] add gitignore file">
+      <created>1671881183786</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1671881183786</updated>
+    </task>
+    <task id="LOCAL-00007" summary="[PA1] add gitignore file">
+      <created>1671881191378</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1671881191378</updated>
+    </task>
+    <task id="LOCAL-00008" summary="[PA1] add gitignore file">
+      <created>1671881230955</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1671881230955</updated>
+    </task>
+    <task id="LOCAL-00009" summary="[PA1] add gitignore file">
+      <created>1671881439837</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1671881439837</updated>
+    </task>
+    <task id="LOCAL-00010" summary="[PA1] add screenshots to readme file">
+      <created>1671881791343</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1671881791343</updated>
+    </task>
+    <task id="LOCAL-00011" summary="[PA1] add screenshots to readme file">
+      <created>1671881868166</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1671881868166</updated>
+    </task>
+    <task id="LOCAL-00012" summary="[PA1] accidentally took another name for the figure. i have already fix it">
+      <created>1671882766582</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1671882766582</updated>
+    </task>
+    <task id="LOCAL-00013" summary="[PA2] Implement vertex and pixel shaders to Surface of Revolution 'Wellenkugel'">
+      <created>1672260896554</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1672260896554</updated>
+    </task>
+    <task id="LOCAL-00014" summary="[PA2] rename file and add gif">
+      <created>1672261972995</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1672261972995</updated>
+    </task>
+    <task id="LOCAL-00015" summary="[PA2] rename file and add gif">
+      <created>1672262102183</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1672262102183</updated>
+    </task>
+    <task id="LOCAL-00016" summary="[PA2] rename file and add gif">
+      <created>1672262159313</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1672262159313</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit" />
+    <MESSAGE value="[PA1] Twice Oblique Trochoid Cylindroid" />
+    <MESSAGE value="[PA1] add gitignore file" />
+    <MESSAGE value="[PA1] add screenshots to readme file" />
+    <MESSAGE value="[PA1] accidentally took another name for the figure. i have already fix it" />
+    <MESSAGE value="[PA2] Implement vertex and pixel shaders to Surface of Revolution 'Wellenkugel'" />
+    <MESSAGE value="[PA2] rename file and add gif" />
+    <option name="LAST_COMMIT_MESSAGE" value="[PA2] rename file and add gif" />
+  </component>
+</project>
